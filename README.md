@@ -4,7 +4,6 @@ Donuk, Engram'sız ön-eğitimli bir LLM'e (pilot: Qwen3-0.6B) sonradan domain-s
 (Python) Engram belleği eklenip eklenemeyeceğini ve bunun LoRA'dan daha iyi olup
 olmadığını test eden deney projesi.
 
-Deney planı ve hipotezler: `C:\Users\ilker\.opencode\plan\engram-domain-memory-deney-plani.md`
 
 ## Yapı
 
