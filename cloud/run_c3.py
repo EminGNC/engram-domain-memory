@@ -50,6 +50,7 @@ def train():
 def eval_all():
     ck = f"{ROOT}/runs/C3_python/engram_step8000.pt"
     run([sys.executable, "eval/eval_fixed.py",
+         "--data-dir", DATA_PY,
          "--lora", "none",
          "--engrams", f"C3={ck}",
          "--out", f"{ROOT}/runs/overnight/eval_C3_python_block.txt"])
