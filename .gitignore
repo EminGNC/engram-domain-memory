@@ -1,5 +1,5 @@
 # Büyük ikili dosyalar ve çıktılar repoya girmez
-data/
+/data/
 runs/
 __pycache__/
 *.pyc
