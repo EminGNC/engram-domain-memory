@@ -99,11 +99,16 @@ def main():
     init_table_norm = float(attach.injections[str(exp_cfg.layer_ids[0])]
                             .multi_head_embedding.embedding.weight.float().norm(dim=1).mean())
 
-    # Ayrik LR gruplari: tablo hizli ogrensin, projeksiyon/gateler daha temkinli
-    table_params, other_params = [], []
-    for inj in attach.injections.values():
-        for name, p in inj.named_parameters():
-            (table_params if "multi_head_embedding" in name else other_params).append(p)
+    # Ayrik LR gruplari: tablo hizli ogrensin, projeksiyon/gateler daha temkinli.
+    # DİKKAT (Bug #3): paylasilan tablo her injection'in named_parameters()'inda
+    # tekrar gorunur -> kimlik bazli dedupe SART, yoksa etkili LR 3 katina cikar.
+    seen = {}
+    for inj in attach.injections.values():
+        for name, p in inj.named_parameters():
+            seen.setdefault(id(p), (name, p))
+    unique = list(seen.values())
+    table_params = [p for name, p in unique if "multi_head_embedding" in name]
+    other_params = [p for name, p in unique if "multi_head_embedding" not in name]
     params = table_params + other_params
     opt = torch.optim.AdamW(
         [
