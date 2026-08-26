@@ -41,15 +41,36 @@ def prep():
 
 
 def train():
-    # Token butcesi sabit: ~16.5M token (T4 hizlandirmasi icin buyuk batch, az adim)
-    run([sys.executable, "train/train_engram.py",
-         "--data-dir", DATA_PY, "--steps", "2700", "--bsz", "12", "--seq-len", "512",
-         "--eval-interval", "450", "--alpha-init", "0.05", "--table-lr", "5e-4",
-         "--out-dir", f"{ROOT}/runs/C3_python"])
+    # Token butcesi sabit (~16.5M); OOM olursa otomatik kucuk konfigurasyona duser.
+    os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
+    budget = 16_500_000
+    configs = [(8, 512), (6, 512), (12, 256), (4, 512)]
+    for bsz, seq in configs:
+        steps = max(1, round(budget / (bsz * seq)))
+        eval_iv = max(200, round(steps / 6))
+        print(f"\n===== FAZ: train (bsz{bsz} x seq{seq} x {steps} adim) =====", flush=True)
+        r = subprocess.run([
+            sys.executable, "train/train_engram.py",
+            "--data-dir", DATA_PY, "--steps", str(steps), "--bsz", str(bsz),
+            "--seq-len", str(seq), "--eval-interval", str(eval_iv),
+            "--alpha-init", "0.05", "--table-lr", "5e-4",
+            "--out-dir", f"{ROOT}/runs/C3_python",
+        ])
+        if r.returncode == 0:
+            print("train tamamlandi:", f"bsz{bsz} x seq{seq}")
+            return
+        print(f"konfigurasyon basarisiz (bsz{bsz}x{seq}), bir sonrakine geciliyor...")
+    raise SystemExit("tum konfigurasyonlar OOM oldu!")
 
 
 def eval_all():
-    ck = f"{ROOT}/runs/C3_python/engram_step2700.pt"
+    import glob as _glob
+
+    cks = sorted(_glob.glob(f"{ROOT}/runs/C3_python/engram_step*.pt"))
+    if not cks:
+        raise SystemExit("C3 checkpoint bulunamadi!")
+    ck = cks[-1]
+    print("eval edilen checkpoint:", ck)
     run([sys.executable, "eval/eval_fixed.py",
          "--data-dir", DATA_PY,
          "--lora", "none",
