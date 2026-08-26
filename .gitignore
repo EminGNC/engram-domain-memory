@@ -1,0 +1,8 @@
+# Büyük ikili dosyalar ve çıktılar repoya girmez
+data/
+runs/
+__pycache__/
+*.pyc
+*.pt
+*.bin
+.ipynb_checkpoints/
