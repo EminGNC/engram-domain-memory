@@ -6,3 +6,5 @@ __pycache__/
 *.pt
 *.bin
 .ipynb_checkpoints/
+
+cloud/token_local.py
