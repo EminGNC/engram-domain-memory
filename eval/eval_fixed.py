@@ -18,6 +18,7 @@ import torch
 from transformers import AutoModelForCausalLM
 
 from configs.config import EngramExperimentConfig, ModelConfig
+from configs.config import resolve_dtype
 from src.data_loader import PackedTokenDataset
 from src.engram import EngramAttach, EngramModuleConfig, HashConfig
 
@@ -71,7 +72,7 @@ def main():
     results = {}
 
     # --- A ---
-    model = AutoModelForCausalLM.from_pretrained(ModelConfig.name, dtype=torch.bfloat16).to(device).eval()
+    model = AutoModelForCausalLM.from_pretrained(ModelConfig.name, dtype=resolve_dtype()).to(device).eval()
     results["A - Base"] = eval_windows(model, windows, device)
     del model
     torch.cuda.empty_cache()
@@ -79,7 +80,7 @@ def main():
     # --- B ---
     if args.lora and args.lora.lower() != "none":
         from peft import PeftModel
-        model = AutoModelForCausalLM.from_pretrained(ModelConfig.name, dtype=torch.bfloat16).to(device)
+        model = AutoModelForCausalLM.from_pretrained(ModelConfig.name, dtype=resolve_dtype()).to(device)
         model = PeftModel.from_pretrained(model, args.lora).eval()
         results["B - LoRA"] = eval_windows(model, windows, device)
         del model
@@ -90,7 +91,7 @@ def main():
     exp = EngramExperimentConfig()
     for spec in args.engrams:
         label, ckpt_path = spec.split("=", 1)
-        model = AutoModelForCausalLM.from_pretrained(ModelConfig.name, dtype=torch.bfloat16).to(device)
+        model = AutoModelForCausalLM.from_pretrained(ModelConfig.name, dtype=resolve_dtype()).to(device)
         h = HashConfig(
             tokenizer_name_or_path=ModelConfig.name,
             layer_ids=exp.layer_ids,

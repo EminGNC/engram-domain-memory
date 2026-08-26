@@ -20,6 +20,7 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from configs.config import ModelConfig
+from configs.config import resolve_dtype
 from src.data_loader import PackedTokenDataset
 from src.engram import EngramAttach, EngramModuleConfig, HashConfig
 
@@ -38,7 +39,7 @@ def main():
     device = "cuda"
     rng = np.random.default_rng(args.seed)
 
-    model = AutoModelForCausalLM.from_pretrained(ModelConfig.name, dtype=torch.bfloat16).to(device)
+    model = AutoModelForCausalLM.from_pretrained(ModelConfig.name, dtype=resolve_dtype()).to(device)
 
     attach = None
     if args.ckpt:

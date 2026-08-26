@@ -17,6 +17,7 @@ import torch
 from transformers import AutoModelForCausalLM
 
 from configs.config import EngramExperimentConfig, ModelConfig
+from configs.config import resolve_dtype
 from src.data_loader import PackedTokenDataset
 from src.engram import EngramAttach, HashConfig, EngramModuleConfig
 
@@ -58,7 +59,7 @@ def main():
     exp_cfg = EngramExperimentConfig(lr=args.lr, batch_size=args.bsz, seq_len=args.seq_len)
 
     print("Model yukleniyor...")
-    model = AutoModelForCausalLM.from_pretrained(ModelConfig.name, dtype=torch.bfloat16).to(device)
+    model = AutoModelForCausalLM.from_pretrained(ModelConfig.name, dtype=resolve_dtype()).to(device)
     model.gradient_checkpointing_enable()  # 8GB kart icin guvenli
 
     hash_cfg = HashConfig(

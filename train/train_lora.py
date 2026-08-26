@@ -19,6 +19,7 @@ from peft import LoraConfig, get_peft_model
 from transformers import AutoModelForCausalLM
 
 from configs.config import ModelConfig
+from configs.config import resolve_dtype
 from src.data_loader import PackedTokenDataset
 
 
@@ -67,7 +68,7 @@ def main():
     out_dir.mkdir(parents=True, exist_ok=True)
 
     print("Model yukleniyor...")
-    model = AutoModelForCausalLM.from_pretrained(ModelConfig.name, dtype=torch.bfloat16).to(device)
+    model = AutoModelForCausalLM.from_pretrained(ModelConfig.name, dtype=resolve_dtype()).to(device)
     model.config.use_cache = False
 
     if args.target_params:

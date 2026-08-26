@@ -15,6 +15,7 @@ import numpy as np
 import torch
 
 from configs.config import EngramExperimentConfig, ModelConfig
+from configs.config import resolve_dtype
 from src.data_loader import PackedTokenDataset
 from src.engram import EngramAttach, EngramModuleConfig, HashConfig
 
@@ -92,7 +93,7 @@ def main():
     # --- 3. Sinyal gucu ------------------------------------------------------
     print("\n=== SINYAL GUCU (val orneklemi uzerinde) ===")
     model = __import__("transformers", fromlist=["AutoModelForCausalLM"]).AutoModelForCausalLM.from_pretrained(
-        ModelConfig.name, dtype=torch.bfloat16
+        ModelConfig.name, dtype=resolve_dtype()
     ).to(device)
     mod_cfg = EngramModuleConfig(n_embed_per_ngram=exp.n_embed_per_ngram)
     attach = EngramAttach(model, h_cfg, mod_cfg, layer_ids=exp.layer_ids)

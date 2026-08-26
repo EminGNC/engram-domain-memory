@@ -14,6 +14,21 @@ class ModelConfig:
     device: str = "cuda"
 
 
+def resolve_dtype():
+    """GPU bf16 desteklemiyorsa (T4/P100/Turing ve öncesi) fp16'ya düş.
+
+    Bulut GPU'larda (Kaggle T4/P100) bfloat16 matmul yoktur; bu yüzden
+    model yüklemede sabit 'bfloat16' yerine bu fonksiyon kullanılmalı.
+    """
+    import torch
+
+    if not torch.cuda.is_available():
+        return torch.float32
+    if torch.cuda.is_bf16_supported():
+        return torch.bfloat16
+    return torch.float16
+
+
 @dataclass
 class EngramExperimentConfig:
     # Hash / tablo

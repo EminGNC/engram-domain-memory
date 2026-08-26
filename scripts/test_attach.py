@@ -16,6 +16,7 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from configs.config import EngramExperimentConfig, ModelConfig
+from configs.config import resolve_dtype
 from src.engram import EngramAttach, HashConfig, EngramModuleConfig
 
 
@@ -28,7 +29,7 @@ def main():
     print("Model yukleniyor (ilk calistirmada ~1.5GB indirir)...")
     tok = AutoTokenizer.from_pretrained(ModelConfig.name)
     model = AutoModelForCausalLM.from_pretrained(
-        ModelConfig.name, dtype=torch.bfloat16
+        ModelConfig.name, dtype=resolve_dtype()
     ).to(device)
     model.eval()
 
