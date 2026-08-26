@@ -41,14 +41,15 @@ def prep():
 
 
 def train():
+    # Token butcesi sabit: ~16.5M token (T4 hizlandirmasi icin buyuk batch, az adim)
     run([sys.executable, "train/train_engram.py",
-         "--data-dir", DATA_PY, "--steps", "8000", "--bsz", "4", "--seq-len", "512",
-         "--eval-interval", "2000", "--alpha-init", "0.05", "--table-lr", "5e-4",
+         "--data-dir", DATA_PY, "--steps", "2700", "--bsz", "12", "--seq-len", "512",
+         "--eval-interval", "450", "--alpha-init", "0.05", "--table-lr", "5e-4",
          "--out-dir", f"{ROOT}/runs/C3_python"])
 
 
 def eval_all():
-    ck = f"{ROOT}/runs/C3_python/engram_step8000.pt"
+    ck = f"{ROOT}/runs/C3_python/engram_step2700.pt"
     run([sys.executable, "eval/eval_fixed.py",
          "--data-dir", DATA_PY,
          "--lora", "none",
