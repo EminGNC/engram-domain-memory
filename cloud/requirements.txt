@@ -1,4 +1,5 @@
-torch>=2.4
+# NOT: torch BURADA listelenmez! Kaggle GPU imajindaki CUDA-surumlu torch
+# kullanilmali; "pip install torch" CPU-wheel ile degistirip bozabilir.
 transformers>=4.51
 peft>=0.19
 datasets>=3.2
