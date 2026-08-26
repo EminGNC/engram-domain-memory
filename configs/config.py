@@ -15,16 +15,18 @@ class ModelConfig:
 
 
 def resolve_dtype():
-    """GPU bf16 desteklemiyorsa (T4/P100/Turing ve öncesi) fp16'ya düş.
+    """GPU bf16 donanimi yoksa (Turing/öncesi: T4, P100...) fp16'ya duser.
 
-    Bulut GPU'larda (Kaggle T4/P100) bfloat16 matmul yoktur; bu yüzden
-    model yüklemede sabit 'bfloat16' yerine bu fonksiyon kullanılmalı.
+    NOT: yeni torch surumleri T4'te bile is_bf16_supported()=True donebiliyor
+    (emulasyon) — ama emulasyon cok yavas. Bu yuzden compute capability'ye
+    dogrudan bakiyoruz (sm_80+ gercek bf16 donanimidir).
     """
     import torch
 
     if not torch.cuda.is_available():
         return torch.float32
-    if torch.cuda.is_bf16_supported():
+    major, _minor = torch.cuda.get_device_capability(0)
+    if major >= 8 and torch.cuda.is_bf16_supported():
         return torch.bfloat16
     return torch.float16
 
